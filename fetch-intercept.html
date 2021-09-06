@@ -9,19 +9,69 @@
     const htmlName = 'fetch-intercept.html';
     const log = (msg) => console.log(`${htmlName}: ${msg}`);
 
-    const scriptURL = `${location.origin}/sw-no-fetch.js?t=${Date.now()}`;
-    installServiceWorker(scriptURL, startTest);
+    Promise.resolve()
+      .then(() => installServiceWorker(`${location.origin}/sw-no-fetch.js?t=${random()}`))
+      .then(() => runTest('/2k.json', 40, 1))
+      .then(() => runTest('/2k.json', 40, 5))
+      .then(() => runTest('/10k.json', 40, 1))
+      .then(() => runTest('/10k.json', 40, 5))
+      .then(() => runTest('/50k.json', 40, 1))
+      .then(() => runTest('/50k.json', 40, 5))
+      .then(() => runTest('/250k.json', 40, 1))
+      .then(() => runTest('/250k.json', 40, 5))
+      .then(() => installServiceWorker(`${location.origin}/sw-pass-thru.js?t=${random()}`))
+      .then(() => runTest('/2k.json', 40, 1))
+      .then(() => runTest('/2k.json', 40, 5))
+      .then(() => runTest('/10k.json', 40, 1))
+      .then(() => runTest('/10k.json', 40, 5))
+      .then(() => runTest('/50k.json', 40, 1))
+      .then(() => runTest('/50k.json', 40, 5))
+      .then(() => runTest('/250k.json', 40, 1))
+      .then(() => runTest('/250k.json', 40, 5))
 
-    function installServiceWorker(scriptURL, onInstall) {
-      navigator.serviceWorker.register(scriptURL);
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        log('controllerchange');
-        if (navigator.serviceWorker.controller?.scriptURL == scriptURL) onInstall();
+
+    function installServiceWorker(scriptURL) {
+      return new Promise((resolve, reject) => {
+        navigator.serviceWorker.register(scriptURL);
+        const callback = () => {
+          controllerScriptURL = navigator.serviceWorker.controller?.scriptURL;
+          log(`controllerChange ${controllerScriptURL}`);
+          if (controllerScriptURL == scriptURL) {
+            navigator.serviceWorker.removeEventListener('controllerchange', callback);
+            resolve();
+          }
+        };
+        navigator.serviceWorker.addEventListener('controllerchange', callback);
+        setTimeout(() => reject(new Error(`service worker install timeout ${scriptURL}`)), 10 * 1000);
       });
     }
 
-    function startTest() {
-      log('startTest');
+    function runTest(dataURL, totalDownloads, threadsCount) {
+      log('runTest');
+      const start = Date.now();
+      const promises = [];
+      const downloadPerThread = totalDownloads / threadsCount;
+      for (let i = 0; i < threadsCount; i += 1) {
+        promises.push(downloadFiles(dataURL, downloadPerThread));
+      }
+      return Promise.all(promises)
+        .then(() => {
+          log(`${dataURL} - ${totalDownloads} downloads in ${threadsCount} threads took ${Date.now() - start}ms`);
+        });
+    }
+
+    function downloadFiles(dataUrl, count) {
+      let pr = Promise.resolve();
+      for (let i = 0; i < count; i += 1) {
+        pr = pr
+          .then(() => fetch(`${dataUrl}?t=${random()}`))
+          .then(res => res.json());
+      }
+      return pr;
+    }
+
+    function random() {
+      return Math.random().toString().substring(2, 12);
     }
   </script>
 </body>

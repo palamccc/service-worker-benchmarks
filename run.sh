@@ -1,0 +1,1 @@
+~/tools/caddy file-server --listen :3000
