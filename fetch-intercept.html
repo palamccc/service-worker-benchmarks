@@ -11,23 +11,11 @@
 
     Promise.resolve()
       .then(() => installServiceWorker(`${location.origin}/sw-no-fetch.js?t=${random()}`))
-      // .then(() => runTest('/2k.json', 40, 1))
-      // .then(() => runTest('/2k.json', 40, 5))
-      // .then(() => runTest('/10k.json', 40, 1))
-      // .then(() => runTest('/10k.json', 40, 5))
-      // .then(() => runTest('/50k.json', 40, 1))
-      // .then(() => runTest('/50k.json', 40, 5))
-      .then(() => runTest('/250k.json', 20, 1))
-      .then(() => runTest('/250k.json', 20, 5))
+      .then(() => runTest('/560k.mp4', 20, 1))
+      .then(() => runTest('/560k.mp4', 20, 5))
       .then(() => installServiceWorker(`${location.origin}/sw-pass-thru.js?t=${random()}`))
-      // .then(() => runTest('/2k.json', 40, 1))
-      // .then(() => runTest('/2k.json', 40, 5))
-      // .then(() => runTest('/10k.json', 40, 1))
-      // .then(() => runTest('/10k.json', 40, 5))
-      // .then(() => runTest('/50k.json', 40, 1))
-      // .then(() => runTest('/50k.json', 40, 5))
-      .then(() => runTest('/250k.json', 20, 1))
-      .then(() => runTest('/250k.json', 20, 5))
+      .then(() => runTest('/560k.mp4', 20, 1))
+      .then(() => runTest('/560k.mp4', 20, 5))
 
 
     function installServiceWorker(scriptURL) {
@@ -63,8 +51,8 @@
       let pr = Promise.resolve();
       for (let i = 0; i < count; i += 1) {
         pr = pr
-          .then(() => fetch(`${dataUrl}&t=${random()}`, { headers: { 'Accept-Encoding': 'identity' } }))
-          .then(res => res.json());
+          .then(() => fetch(`${dataUrl}&t=${random()}`, { headers: new Headers({ 'Accept-Encoding': 'identity' }) }))
+          .then(res => res.blob())
       }
       return pr;
     }
