@@ -11,11 +11,14 @@
 
     Promise.resolve()
       .then(() => installServiceWorker(`${location.origin}/sw-no-fetch.js?t=${random()}`))
-      .then(() => runTest('/50k.mp4', 20, 1))
-      .then(() => runTest('/50k.mp4', 20, 5))
+      .then(() => runTest('/50k.mp4', 10, 1))
+      .then(() => runTest('/50k.mp4', 10, 5))
+      .then(() => installServiceWorker(`${location.origin}/sw-exit.js?t=${random()}`))
+      .then(() => runTest('/50k.mp4', 10, 1))
+      .then(() => runTest('/50k.mp4', 10, 5))
       .then(() => installServiceWorker(`${location.origin}/sw-pass-thru.js?t=${random()}`))
-      .then(() => runTest('/50k.mp4', 20, 1))
-      .then(() => runTest('/50k.mp4', 20, 5))
+      .then(() => runTest('/50k.mp4', 10, 1))
+      .then(() => runTest('/50k.mp4', 10, 5))
 
 
     function installServiceWorker(scriptURL) {
