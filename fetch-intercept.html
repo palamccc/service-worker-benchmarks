@@ -63,7 +63,7 @@
       let pr = Promise.resolve();
       for (let i = 0; i < count; i += 1) {
         pr = pr
-          .then(() => fetch(`${dataUrl}&t=${random()}`))
+          .then(() => fetch(`${dataUrl}&t=${random()}`, { headers: { 'Accept-Encoding': 'identity' } }))
           .then(res => res.json());
       }
       return pr;
