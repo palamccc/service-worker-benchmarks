@@ -51,7 +51,7 @@
       const promises = [];
       const downloadPerThread = totalDownloads / threadsCount;
       for (let i = 0; i < threadsCount; i += 1) {
-        promises.push(downloadFiles(dataURL, downloadPerThread));
+        promises.push(downloadFiles(`${dataURL}?p=${threadsCount}`, downloadPerThread));
       }
       return Promise.all(promises)
         .then(() => {
@@ -63,7 +63,7 @@
       let pr = Promise.resolve();
       for (let i = 0; i < count; i += 1) {
         pr = pr
-          .then(() => fetch(`${dataUrl}?t=${random()}`))
+          .then(() => fetch(`${dataUrl}&t=${random()}`))
           .then(res => res.json());
       }
       return pr;
